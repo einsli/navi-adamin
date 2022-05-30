@@ -9,3 +9,4 @@
 2.  配置.env数据库连接
 3.  ./run-server.sh
 
+## email: einsli@163.com
