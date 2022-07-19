@@ -3,6 +3,8 @@ use std::io;
 use dotenv::dotenv;
 use std::sync::Mutex;
 use std::env;
+use actix_cors::Cors;
+use actix_web::http::header;
 use crate::error::NaviError;
 use mysql::Pool as mysqlPool;
 use crate::routers::{general_routes, groups_routes, sites_routes};
@@ -47,7 +49,16 @@ async fn main() -> io::Result<()>{
 
     let app
         = move || {
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT, header::ACCESS_CONTROL_ALLOW_ORIGIN])
+            .allowed_header(header::CONTENT_TYPE)
+            .allow_any_origin()
+            .supports_credentials()
+            .max_age(3600);
         App::new()
+            .wrap(cors)
             .app_data(shared_data.clone())
             .app_data(web::JsonConfig::default().error_handler(|_err, _req| {
                 NaviError::InvalidInput("invalid Json input".to_string()).into()
